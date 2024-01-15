@@ -78,12 +78,12 @@
       for (var j = 0; j < storedSimulations.length; j++) {
         if (storedSimulations[j].success) {
           totalSuccess++;
-          totalConsecutiveSuccess++;
-          totalConsecutiveFailure = 0; // Reset consecutive failure count
+          ConsecutiveSuccess++;
+          ConsecutiveFailure = 0; // Reset consecutive failure count
         } else {
           totalFailure++;
-          totalConsecutiveFailure++;
-          totalConsecutiveSuccess = 0; // Reset consecutive success count
+          ConsecutiveFailure++;
+          ConsecutiveSuccess = 0; // Reset consecutive success count
         }
       }
 
