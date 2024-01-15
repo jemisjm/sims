@@ -57,4 +57,50 @@
       if (randomValue <= probability) {
         successCount++;
         consecutiveSuccess++;
-        consecutiveF
+        consecutiveFailure = 0; // Reset consecutive failure count
+      } else {
+        failureCount++;
+        consecutiveFailure++;
+        consecutiveSuccess = 0; // Reset consecutive success count
+      }
+
+      // 현재 시뮬레이션 결과 저장
+      storedSimulations.push({
+        success: randomValue <= probability,
+        consecutiveSuccess: consecutiveSuccess,
+        consecutiveFailure: consecutiveFailure
+      });
+      localStorage.setItem("simulations", JSON.stringify(storedSimulations));
+
+      // 전체 시뮬레이션 결과 통계
+      var totalSuccess = 0;
+      var totalFailure = 0;
+
+      for (var j = 0; j < storedSimulations.length; j++) {
+        if (storedSimulations[j].success) {
+          totalSuccess++;
+        } else {
+          totalFailure++;
+        }
+      }
+
+      var resultText = `
+        전체 시뮬레이션 횟수: ${totalSimulations}
+        현재 시뮬레이션 결과: ${randomValue <= probability ? "성공" : "실패"}
+        총 연속 성공 횟수: ${consecutiveSuccess}
+        총 연속 실패 횟수: ${consecutiveFailure}
+        총 성공 횟수: ${totalSuccess}
+        총 실패 횟수: ${totalFailure}
+      `;
+
+      resultElement.textContent = resultText;
+    }
+
+    function resetSimulation() {
+      // 시뮬레이션 기록 초기화
+      localStorage.removeItem("simulations");
+      document.getElementById("result").textContent = "시뮬레이션 결과가 초기화되었습니다.";
+    }
+  </script>
+</body>
+</html>
