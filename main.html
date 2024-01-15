@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Probability Simulation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 50px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    #result {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Probability Simulation</h1>
+  <label for="probability">확률 (0~1):</label>
+  <input type="number" id="probability" step="0.01" value="0.5">
+  <br>
+  <button onclick="runSimulation()">시뮬레이션 실행</button>
+  <p id="result"></p>
+
+  <script>
+    function runSimulation() {
+      var probability = parseFloat(document.getElementById("probability").value);
+      var resultElement = document.getElementById("result");
+
+      if (isNaN(probability) || probability < 0 || probability > 1) {
+        resultElement.textContent = "올바른 확률 값을 입력하세요 (0~1)";
+        return;
+      }
+
+      var totalAttempts = 1000;
+      var successCount = 0;
+      var consecutiveSuccess = 0;
+      var consecutiveFailure = 0;
+
+      for (var i = 0; i < totalAttempts; i++) {
+        var randomValue = Math.random();
+
+        if (randomValue <= probability) {
+          successCount++;
+          consecutiveSuccess++;
+          consecutiveFailure = 0; // Reset consecutive failure count
+        } else {
+          consecutiveFailure++;
+          consecutiveSuccess = 0; // Reset consecutive success count
+        }
+      }
+
+      var resultText = `
+        시뮬레이션 결과:
+        성공 횟수: ${successCount}
+        연속 성공 횟수: ${consecutiveSuccess}
+        총 실패 횟수: ${totalAttempts - successCount}
+        연속 실패 횟수: ${consecutiveFailure}
+      `;
+
+      resultElement.textContent = resultText;
+    }
+  </script>
+</body>
+</html>
