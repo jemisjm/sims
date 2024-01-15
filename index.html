@@ -87,16 +87,16 @@
 
       var resultText = `
         전체 시뮬레이션 횟수: ${totalSimulations}
+        \n
         현재 시뮬레이션 결과:
-        성공 횟수: ${successCount}
+        \n
         연속 성공 횟수: ${consecutiveSuccess}
-        총 실패 횟수: ${failureCount}
+        \t
         연속 실패 횟수: ${consecutiveFailure}
-        전체 시뮬레이션 통계:
+        \n
         총 성공 횟수: ${totalSuccess}
+        \t
         총 실패 횟수: ${totalFailure}
-        총 연속 성공 횟수: ${totalConsecutiveSuccess}
-        총 연속 실패 횟수: ${totalConsecutiveFailure}
       `;
 
       resultElement.textContent = resultText;
