@@ -39,8 +39,13 @@
         return;
       }
 
+      // 이전 성공, 실패 횟수 불러오기
+      var storedSuccessCount = sessionStorage.getItem("successCount") || 0;
+      var storedFailureCount = sessionStorage.getItem("failureCount") || 0;
+
       var totalAttempts = 1000;
-      var successCount = 0;
+      var successCount = parseInt(storedSuccessCount, 10);
+      var failureCount = parseInt(storedFailureCount, 10);
       var consecutiveSuccess = 0;
       var consecutiveFailure = 0;
 
@@ -52,21 +57,15 @@
           consecutiveSuccess++;
           consecutiveFailure = 0; // Reset consecutive failure count
         } else {
+          failureCount++;
           consecutiveFailure++;
           consecutiveSuccess = 0; // Reset consecutive success count
         }
       }
 
-      var resultText = `
-        시뮬레이션 결과:
-        성공 횟수: ${successCount}
-        연속 성공 횟수: ${consecutiveSuccess}
-        총 실패 횟수: ${totalAttempts - successCount}
-        연속 실패 횟수: ${consecutiveFailure}
-      `;
+      // 현재 성공, 실패 횟수 저장
+      sessionStorage.setItem("successCount", successCount);
+      sessionStorage.setItem("failureCount", failureCount);
 
-      resultElement.textContent = resultText;
-    }
-  </script>
-</body>
-</html>
+      var resultText = `
+   
