@@ -66,8 +66,6 @@
       // 현재 시뮬레이션 결과 저장
       storedSimulations.push({
         success: randomValue <= probability,
-        consecutiveSuccess: consecutiveSuccess,
-        consecutiveFailure: consecutiveFailure
       });
       localStorage.setItem("simulations", JSON.stringify(storedSimulations));
 
