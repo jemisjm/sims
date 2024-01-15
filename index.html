@@ -27,6 +27,7 @@
   <input type="number" id="probability" step="0.01" value="0.5">
   <br>
   <button onclick="runSimulation()">시뮬레이션 실행</button>
+  <button onclick="resetSimulation()">리셋</button>
   <p id="result"></p>
 
   <script>
@@ -41,7 +42,7 @@
 
       // 현재 시뮬레이션 결과 불러오기
       var storedSimulations = JSON.parse(localStorage.getItem("simulations")) || [];
-      
+
       var totalSimulations = storedSimulations.length + 1;
       var successCount = 0;
       var failureCount = 0;
@@ -50,26 +51,21 @@
 	  var resultnow = "";
 
       // 현재 시뮬레이션 수행
-      for (var i = 0; i < 1; i++) { // 1회만 수행
-        var randomValue = Math.random();
+      var randomValue = Math.random();
 
-        if (randomValue <= probability) {
-          successCount++;
-          consecutiveSuccess++;
-          consecutiveFailure = 0;
-		  resultnow="성공";
-        } else {
-          failureCount++;
-          consecutiveFailure++;
-          consecutiveSuccess = 0;
-		  resultnow= "실패";
-        }
+      if (randomValue <= probability) {
+        successCount++;
+        consecutiveSuccess++;
+		resultnow = "성공";
+      } else {
+        failureCount++;
+        consecutiveFailure++;
+		resultnow = "실패";
       }
 
       // 현재 시뮬레이션 결과 저장
       storedSimulations.push({
-        successCount: successCount,
-        failureCount: failureCount,
+        success: randomValue <= probability,
         consecutiveSuccess: consecutiveSuccess,
         consecutiveFailure: consecutiveFailure
       });
@@ -82,22 +78,33 @@
       var totalConsecutiveFailure = 0;
 
       for (var j = 0; j < storedSimulations.length; j++) {
-        totalSuccess += storedSimulations[j].successCount;
-        totalFailure += storedSimulations[j].failureCount;
-        totalConsecutiveSuccess += storedSimulations[j].consecutiveSuccess;
-        totalConsecutiveFailure += storedSimulations[j].consecutiveFailure;
+        if (storedSimulations[j].success) {
+          totalSuccess++;
+          totalConsecutiveSuccess++;
+          totalConsecutiveFailure = 0; // Reset consecutive failure count
+        } else {
+          totalFailure++;
+          totalConsecutiveFailure++;
+          totalConsecutiveSuccess = 0; // Reset consecutive success count
+        }
       }
 
       var resultText = `
         전체 시뮬레이션 횟수: ${totalSimulations}
-        현재 시뮬레이션 결과: ${resultnow} <br>
-        연속 성공 횟수: ${consecutiveSuccess} 
-        연속 실패 횟수: ${consecutiveFailure} <br>
+        현재 시뮬레이션 결과: ${randomValue <= probability ? "성공" : "실패"}
+        연속 성공 횟수: ${consecutiveSuccess}
+        연속 실패 횟수: ${consecutiveFailure}
         총 성공 횟수: ${totalSuccess}
         총 실패 횟수: ${totalFailure}
       `;
 
       resultElement.textContent = resultText;
+    }
+
+    function resetSimulation() {
+      // 시뮬레이션 기록 초기화
+      localStorage.removeItem("simulations");
+      document.getElementById("result").textContent = "시뮬레이션 결과가 초기화되었습니다.";
     }
   </script>
 </body>
