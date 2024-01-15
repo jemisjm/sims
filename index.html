@@ -41,26 +41,64 @@
 
       // 현재 시뮬레이션 결과 불러오기
       var storedSimulations = JSON.parse(localStorage.getItem("simulations")) || [];
-
+      
       var totalSimulations = storedSimulations.length + 1;
       var successCount = 0;
       var failureCount = 0;
       var consecutiveSuccess = 0;
       var consecutiveFailure = 0;
+	  var resultnow = "";
 
       // 현재 시뮬레이션 수행
-      var randomValue = Math.random();
+      for (var i = 0; i < 1; i++) { // 1회만 수행
+        var randomValue = Math.random();
 
-      if (randomValue <= probability) {
-        successCount++;
-        consecutiveSuccess++;
-        consecutiveFailure = 0; // Reset consecutive failure count
-      } else {
-        failureCount++;
-        consecutiveFailure++;
-        consecutiveSuccess = 0; // Reset consecutive success count
+        if (randomValue <= probability) {
+          successCount++;
+          consecutiveSuccess++;
+          consecutiveFailure = 0;
+		  resultnow="성공";
+        } else {
+          failureCount++;
+          consecutiveFailure++;
+          consecutiveSuccess = 0;
+		  resultnow= "실패";
+        }
       }
 
       // 현재 시뮬레이션 결과 저장
       storedSimulations.push({
-        success: randomValue <= prob
+        successCount: successCount,
+        failureCount: failureCount,
+        consecutiveSuccess: consecutiveSuccess,
+        consecutiveFailure: consecutiveFailure
+      });
+      localStorage.setItem("simulations", JSON.stringify(storedSimulations));
+
+      // 전체 시뮬레이션 결과 통계
+      var totalSuccess = 0;
+      var totalFailure = 0;
+      var totalConsecutiveSuccess = 0;
+      var totalConsecutiveFailure = 0;
+
+      for (var j = 0; j < storedSimulations.length; j++) {
+        totalSuccess += storedSimulations[j].successCount;
+        totalFailure += storedSimulations[j].failureCount;
+        totalConsecutiveSuccess += storedSimulations[j].consecutiveSuccess;
+        totalConsecutiveFailure += storedSimulations[j].consecutiveFailure;
+      }
+
+      var resultText = `
+        전체 시뮬레이션 횟수: ${totalSimulations} \t
+        현재 시뮬레이션 결과: ${resultnow} \n
+        연속 성공 횟수: ${consecutiveSuccess} \n
+        연속 실패 횟수: ${consecutiveFailure} \n
+        총 성공 횟수: ${totalSuccess}
+        총 실패 횟수: ${totalFailure}
+      `;
+
+      resultElement.textContent = resultText;
+    }
+  </script>
+</body>
+</html>
