@@ -3,101 +3,121 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Probability Simulation</title>
+  <title>과목 및 마감일 관리</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 50px;
+    .warning {
+      color: red;
     }
-
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-
-    #result {
-      margin-top: 20px;
-      white-space: pre-line;
+    .completed {
+      color: blue;
     }
   </style>
 </head>
 <body>
-  <h1>Probability Simulation</h1>
-  <label for="probability">확률 (0~1):</label>
-  <input type="number" id="probability" step="0.01" value="0.5">
-  <br>
-  <button onclick="runSimulation()">시뮬레이션 실행</button>
-  <button onclick="resetSimulation()">리셋</button>
-  <p id="result"></p>
 
-  <script>
-    var consecutiveSuccess = 0;
-    var consecutiveFailure = 0;
+<h2>과목 및 마감일</h2>
 
-    function runSimulation() {
-      var probability = parseFloat(document.getElementById("probability").value);
-      var resultElement = document.getElementById("result");
+<form id="taskForm">
+  <label for="subject">과목:</label>
+  <input type="text" id="subject" required>
 
-      if (isNaN(probability) || probability < 0 || probability > 1) {
-        resultElement.textContent = "올바른 확률 값을 입력하세요 (0~1)";
-        return;
-      }
+  <label for="deadlineDay">마감일 요일:</label>
+  <select id="deadlineDay" required>
+    <option value="일">일요일</option>
+    <option value="월">월요일</option>
+    <option value="화">화요일</option>
+    <option value="수">수요일</option>
+    <option value="목">목요일</option>
+    <option value="금">금요일</option>
+    <option value="토">토요일</option>
+  </select>
 
-      // 현재 시뮬레이션 결과 불러오기
-      var storedSimulations = JSON.parse(localStorage.getItem("simulations")) || [];
+  <button type="button" onclick="addTask()">과목 추가</button>
+</form>
 
-      var totalSimulations = storedSimulations.length + 1;
-      var successCount = 0;
-      var failureCount = 0;
+<ul id="taskList"></ul>
 
-      // 현재 시뮬레이션 수행
-      var randomValue = Math.random();
+<div id="todayDate"></div>
 
-      if (randomValue <= probability) {
-        successCount++;
-        consecutiveSuccess++;
-        consecutiveFailure = 0; // Reset consecutive failure count
-      } else {
-        failureCount++;
-        consecutiveFailure++;
-        consecutiveSuccess = 0; // Reset consecutive success count
-      }
+<button type="button" onclick="resetTasks()">리셋</button>
 
-      // 현재 시뮬레이션 결과 저장
-      storedSimulations.push({
-        success: randomValue <= probability,
-        consecutiveSuccess: consecutiveSuccess,
-        consecutiveFailure: consecutiveFailure
-      });
-      localStorage.setItem("simulations", JSON.stringify(storedSimulations));
+<script>
+  function addTask() {
+    const subject = document.getElementById('subject').value;
+    const selectedDay = document.getElementById('deadlineDay').value;
+    const today = new Date();
 
-      // 전체 시뮬레이션 결과 통계
-      var totalSuccess = 0;
-      var totalFailure = 0;
+    const taskList = document.getElementById('taskList');
+    const listItem = document.createElement('li');
+    listItem.innerHTML = `<input type="checkbox" id="${subject}"> ${subject}`;
 
-      for (var j = 0; j < storedSimulations.length; j++) {
-        if (storedSimulations[j].success) {
-          totalSuccess++;
-        } else {
-          totalFailure++;
-        }
-      }
+    const days = ['일', '월', '화', '수', '목', '금', '토'];
 
-      var resultText = `
-        시행 횟수: ${totalSimulations}        결과: ${randomValue <= probability ? "성공" : "실패"}
-        연속 성공: ${consecutiveSuccess} 연속 실패: ${consecutiveFailure}
-          총 성공: ${totalSuccess}         총 실패: ${totalFailure}
-      `;
+    // Find the index of the selected day
+    const selectedDayIndex = days.indexOf(selectedDay);
+    
+    // Calculate the deadline day based on today's day
+    const deadlineDayIndex = (today.getDay() + selectedDayIndex) % 7;
+    const deadlineDay = days[deadlineDayIndex];
 
-      resultElement.textContent = resultText;
+    if (deadlineDay === days[today.getDay()]) {
+      listItem.innerHTML += ` (오늘 마감)`;
+    } else if (deadlineDay === days[(today.getDay() + 6) % 7]) {
+      listItem.innerHTML += ` (내일 마감)`;
+      listItem.style.color = 'red'; // 빨간색 경고 표시
     }
 
-    function resetSimulation() {
-      // 시뮬레이션 기록 초기화
-      localStorage.removeItem("simulations");
-      document.getElementById("result").textContent = "시뮬레이션 결과가 초기화되었습니다.";
+    listItem.innerHTML += ` (${deadlineDay}요일)`;
+
+    listItem.querySelector('input').addEventListener('change', checkCompletion);
+    taskList.appendChild(listItem);
+
+    document.getElementById('subject').value = '';
+    document.getElementById('deadlineDay').value = '';
+  }
+
+  function checkCompletion() {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+
+    if (allChecked) {
+      document.getElementById('taskList').style.color = 'blue'; // 파란색 완료 표시
+      document.getElementById('todayDate').style.color = 'blue'; // 파란색 완료 표시
+    } else {
+      document.getElementById('taskList').style.color = ''; // 색상 초기화
+      document.getElementById('todayDate').style.color = ''; // 색상 초기화
     }
-  </script>
+  }
+
+  function resetTasks() {
+    document.getElementById('taskList').innerHTML = '';
+    document.getElementById('todayDate').innerHTML = '';
+    document.getElementById('taskList').style.color = ''; // 색상 초기화
+    document.getElementById('todayDate').style.color = ''; // 색상 초기화
+  }
+
+  // Display today's date and day
+  const days = ['일', '월', '화', '수', '목', '금', '토'];
+  const today = new Date();
+  const todayDay = days[today.getDay()];
+  document.getElementById('todayDate').innerText = `오늘 날짜: ${formatDate(today)} (${todayDay}요일)`;
+
+  function formatDate(date) {
+    const year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
+
+    if (month < 10) {
+      month = `0${month}`;
+    }
+
+    if (day < 10) {
+      day = `0${day}`;
+    }
+
+    return `${year}-${month}-${day}`;
+  }
+</script>
+
 </body>
 </html>
